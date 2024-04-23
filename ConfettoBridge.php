@@ -26,13 +26,12 @@ class ConfettoBridge extends BridgeAbstract
             $articleBody = $element->find('p.act-body', 0);
 
             $item['uri'] = $articleThumb->href;
-            $imageSrc = $this->getURI() . '/' . ($articleImage->src);
             $item['title'] = trim($articleTitle->innertext);
             $item['timestamp'] = str_replace('.', '-', $articleDate->innertext);
 
             $content = '<div>';
             if ($articleImage) {
-                $content .= '<img src="' . $imageSrc . '" alt="thumbnail">';
+                $content .= '<img src="' . $articleImage->src . '" alt="thumbnail">';
             }
             if ($articleBody) {
                 $content .= '<p>' . $articleBody->innertext . '</p>';
