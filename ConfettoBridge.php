@@ -31,8 +31,8 @@ class ConfettoBridge extends BridgeAbstract
 
             $content = '<div>';
             if ($articleImage) {
-                $content .= '<a href="' . $imageSrc . '" target="_blank">';
-                $content .= '<img src="' . $imageSrc . '" alt="thumbnail">';
+                $content .= '<a href="' . $articleImage->src . '" target="_blank">';
+                $content .= '<img src="' . $articleImage->src . '" alt="thumbnail">';
                 $content .= '</a>';
             }
             if ($articleBody) {
