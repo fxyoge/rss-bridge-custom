@@ -11,7 +11,9 @@ class SynekismBridge extends BridgeAbstract
 
     public function collectData()
     {
-        $html = file_get_html('https://www.synekism.com/index.php');
+        $html = getSimpleHTMLDOM($this->getURI() . '?index.php');
+
+        $html = defaultLinkTo($html, self::URI);
 
         $entries = $html->find('div#leftDDiv div.divisionalDiv');
 
