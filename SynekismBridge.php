@@ -20,7 +20,11 @@ class SynekismBridge extends BridgeAbstract
         foreach ($entries as $entry) {
             $title = $entry->find('h1 a', 0)->plaintext;
             $link = $entry->find('h1 a', 0)->href;
+            
             $date = $entry->find('p', 0)->plaintext;
+            $date = str_replace(' at', '', $date);
+            $date = DateTime::createFromFormat('F j, Y g:i A', $date)->format('Y-m-d H:i:s');
+
             $content = $entry->find('p', 1)->innertext;
 
             $item = array();
