@@ -29,7 +29,7 @@ class SynekismBridge extends BridgeAbstract
 
             $item = array();
             $item['title'] = $title;
-            $item['uri'] = 'https://www.synekism.com/' . $link;
+            $item['uri'] = $link;
             $item['timestamp'] = strtotime($date);
             $item['content'] = $content;
 
