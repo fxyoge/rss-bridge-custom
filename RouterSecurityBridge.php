@@ -54,6 +54,8 @@ class RouterSecurityBridge extends BridgeAbstract
                 } else {
                     Debug::log("No content found for title: $title");
                 }
+            } else {
+                Debug::log("Skipping element: " . $element->tag);
             }
         }
     }
