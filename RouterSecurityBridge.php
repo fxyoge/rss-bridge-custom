@@ -19,49 +19,41 @@ class RouterSecurityBridge extends BridgeAbstract
 
         $html = defaultLinkTo($html, self::URI);
 
-        $months = $html->find('div.MainDivClass p');
+        $contentDiv = $html->find('div.MainDivClass', 0);
 
-        if (empty($months)) {
-            Debug::log("No months found in the HTML document.");
+        if (!$contentDiv) {
+            Debug::log("Content div not found.");
             return;
         }
 
-        foreach ($months as $month) {
-            if (preg_match('/^[A-Z]{3,10} \d{4}$/', $month->plaintext)) {
-                $date = $month->plaintext;
-                Debug::log("Processing date: $date\n");
+        $currentMonth = null;
 
-                $entries = $month->next_sibling();
+        foreach ($contentDiv->children as $element) {
+            if ($element->tag === 'p' && preg_match('/^[A-Z]{3,10} \d{4}$/', $element->plaintext)) {
+                $currentMonth = $element->plaintext;
+                Debug::log("Processing month: $currentMonth");
+            } elseif ($currentMonth && $element->tag === 'p' && $element->class === 'title2') {
+                $title = $element->plaintext;
+                Debug::log("Found title: $title");
 
-                while ($entries && $entries->tag === 'p') {
-                    $title = $entries->find('p.title2', 0);
-                    if ($title) {
-                        $titleText = $title->plaintext;
-                        Debug::log("Found title: $titleText");
+                $contentElement = $element->next_sibling();
+                if ($contentElement && $contentElement->tag === 'p' && $contentElement->class === 'para2') {
+                    $link = $contentElement->find('a', 0)->href;
+                    $contentText = $contentElement->innertext;
+                    preg_match('/[A-Z][a-z]+ \d{1,2}, \d{4}/', $contentText, $matches);
+                    $dateText = $matches[0] ?? $currentMonth;
+                    $dateFormatted = DateTime::createFromFormat('F j, Y', trim($dateText))->format('Y-m-d H:i:s');
 
-                        $content = $entries->find('p.para2', 0);
-                        if ($content) {
-                            $link = $content->find('a', 0)->href;
-                            $contentText = $content->innertext;
+                    $item = [];
+                    $item['title'] = $title;
+                    $item['uri'] = $link;
+                    $item['timestamp'] = strtotime($dateFormatted);
+                    $item['content'] = $contentText;
 
-                            $dateText = $content->find('br', 1)->next_sibling()->plaintext;
-                            $dateFormatted = DateTime::createFromFormat('F d, Y', trim($date . ' ' . $dateText))->format('Y-m-d H:i:s');
-
-                            $item = [];
-                            $item['title'] = $titleText;
-                            $item['uri'] = $link;
-                            $item['timestamp'] = strtotime($dateFormatted);
-                            $item['content'] = $contentText;
-
-                            $this->items[] = $item;
-                        } else {
-                            Debug::log("No content found for title: $titleText");
-                        }
-                    }
-                    $entries = $entries->next_sibling();
+                    $this->items[] = $item;
+                } else {
+                    Debug::log("No content found for title: $title");
                 }
-            } else {
-                Debug::log("No matching date format found: " . $month->plaintext);
             }
         }
     }
